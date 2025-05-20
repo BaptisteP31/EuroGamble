@@ -12,6 +12,7 @@ model User {
   email        String    @unique
   passwordHash String
   displayName  String
+  role         String    @default("user")
   createdAt    DateTime  @default(now())
   predictions  Prediction[]
   groups       Group[]   @relation("GroupOwner")

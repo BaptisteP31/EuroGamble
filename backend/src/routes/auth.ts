@@ -34,7 +34,7 @@ router.post('/register', async (req, res) => {
                     },
                 });
                 
-                const token = generateToken({ id: user.id, email: user.email });
+                const token = generateToken({ id: user.id, email: user.email, role: user.role });
                 res.status(201).json({ 
                     token, 
                     user: { id: user.id, displayName: user.displayName } 
@@ -73,7 +73,7 @@ router.post('/login', async (req, res) => {
                 if (!valid) {
                     res.status(401).json({ error: 'Invalid credentials' });
                 } else {
-                    const token = generateToken({ id: user.id, email: user.email });
+                    const token = generateToken({ id: user.id, email: user.email, role: user.role });
                     res.json({ token, user: { id: user.id, displayName: user.displayName } });
                 }
             }

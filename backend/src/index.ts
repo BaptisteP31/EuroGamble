@@ -1,7 +1,13 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+
+// ROUTES
 import authRoutes from './routes/auth';
+import entriesRouter from './routes/entry';
+
+// MIDDLEWARES
+import { authMiddleware } from './middlewares/authMiddleware';
 
 dotenv.config();
 
@@ -10,6 +16,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use('/auth', authRoutes);
+app.use('/entries', authMiddleware, entriesRouter);
 
 // /ping route
 app.get('/ping', (_, res) => {
