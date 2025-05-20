@@ -1,0 +1,81 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           Int       @id @default(autoincrement())
+  email        String    @unique
+  passwordHash String
+  displayName  String
+  createdAt    DateTime  @default(now())
+  predictions  Prediction[]
+  groups       Group[]   @relation("GroupOwner")
+  groupMembers GroupMember[]
+}
+
+model Contest {
+  id                 Int       @id @default(autoincrement())
+  name               String
+  submissionDeadline DateTime
+  isActive           Boolean   @default(true)
+  entries            Entry[]
+  results            Result[]
+  predictions        Prediction[]
+  groups             Group[]
+}
+
+model Entry {
+  id          Int    @id @default(autoincrement())
+  contest     Contest @relation(fields: [contestId], references: [id], onDelete: Cascade)
+  contestId   Int
+  countryCode String
+  title       String
+  artist      String
+  results     Result[]
+  @@unique([contestId, countryCode])
+}
+
+model Result {
+  id       Int     @id @default(autoincrement())
+  entry    Entry   @relation(fields: [entryId], references: [id], onDelete: Cascade)
+  entryId  Int
+  position Int
+  contest  Contest @relation(fields: [contestId], references: [id], onDelete: Cascade)
+  contestId Int
+  @@unique([entryId])
+}
+
+model Prediction {
+  id          Int      @id @default(autoincrement())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      Int
+  contest     Contest  @relation(fields: [contestId], references: [id], onDelete: Cascade)
+  contestId   Int
+  ranking     Json
+  submittedAt DateTime @default(now())
+  @@unique([userId, contestId])
+}
+
+model Group {
+  id        Int          @id @default(autoincrement())
+  name      String
+  code      String       @unique
+  owner     User?        @relation("GroupOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+  ownerId   Int?
+  contest   Contest      @relation(fields: [contestId], references: [id], onDelete: Cascade)
+  contestId Int
+  members   GroupMember[]
+}
+
+model GroupMember {
+  group   Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  groupId Int
+  user    User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId  Int
+  @@id([groupId, userId])
+}
