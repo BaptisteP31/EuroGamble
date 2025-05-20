@@ -21,7 +21,8 @@ model User {
 
 model Contest {
   id                 Int       @id @default(autoincrement())
-  name               String
+  year               Int
+  hostCountryCode    String
   submissionDeadline DateTime
   isActive           Boolean   @default(true)
   entries            Entry[]

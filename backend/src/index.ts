@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 // ROUTES
 import authRoutes from './routes/auth';
 import entriesRouter from './routes/entry';
+import contestRouter from './routes/contest';
 
 // MIDDLEWARES
 import { authMiddleware } from './middlewares/authMiddleware';
@@ -17,6 +18,7 @@ app.use(express.json());
 
 app.use('/auth', authRoutes);
 app.use('/entries', authMiddleware, entriesRouter);
+app.use('/contest', authMiddleware, contestRouter);
 
 // /ping route
 app.get('/ping', (_, res) => {
