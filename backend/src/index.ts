@@ -8,6 +8,7 @@ import entriesRouter from './routes/entry';
 import contestRouter from './routes/contest';
 import userRouter from './routes/user';
 import resultRouter from './routes/result';
+import predictionRouter from './routes/prediction';
 
 // MIDDLEWARES
 import { authMiddleware } from './middlewares/authMiddleware';
@@ -23,6 +24,7 @@ app.use('/entry', authMiddleware, entriesRouter);
 app.use('/contest', authMiddleware, contestRouter);
 app.use('/user', authMiddleware, userRouter);
 app.use('/result', authMiddleware, resultRouter);
+app.use('/prediction', authMiddleware, predictionRouter);
 
 // /ping route
 app.get('/ping', (_, res) => {

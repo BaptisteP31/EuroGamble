@@ -40,6 +40,7 @@ model Entry {
   title       String
   artist      String
   results     Result[]
+  predictions Prediction[]
   @@unique([contestId, countryCode])
 }
 
@@ -54,14 +55,16 @@ model Result {
 }
 
 model Prediction {
-  id          Int      @id @default(autoincrement())
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId      Int
-  contest     Contest  @relation(fields: [contestId], references: [id], onDelete: Cascade)
-  contestId   Int
-  ranking     Json
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int
+  contest   Contest  @relation(fields: [contestId], references: [id], onDelete: Cascade)
+  contestId Int
+  entry     Entry    @relation(fields: [entryId], references: [id], onDelete: Cascade)
+  entryId   Int
+  position  Int
   submittedAt DateTime @default(now())
-  @@unique([userId, contestId])
+  @@unique([userId, contestId, entryId])
 }
 
 model Group {
