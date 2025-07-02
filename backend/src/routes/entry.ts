@@ -33,9 +33,13 @@ router.post('/', adminMiddleware, async (req, res) => {
         data: { contestId, countryCode, title, artist },
       });
       res.status(201).json(entry);
-    } catch (error) {
-      console.error('Create entry error:', error);
-      res.status(500).json({ error: 'Internal server error' });
+    } catch (error: any) {
+      if (error.code === 'P2003' && error.meta?.constraint?.includes('contestId')) {
+        res.status(400).json({ error: 'Invalid contestId: referenced contest does not exist.' });
+      } else {
+        console.error('Create entry error:', error);
+        res.status(500).json({ error: 'Internal server error' });
+      }
     }
   }
 });
@@ -80,9 +84,13 @@ router.delete('/:id', adminMiddleware, async (req, res) => {
     try {
       await prisma.entry.delete({ where: { id } });
       res.status(204).send();
-    } catch (error) {
-      console.error('Delete entry error:', error);
-      res.status(500).json({ error: 'Internal server error' });
+    } catch (error: any) {
+      if (error.code === 'P2025') {
+        res.status(404).json({ error: 'Entry not found' });
+      } else {
+        console.error('Delete entry error:', error);
+        res.status(500).json({ error: 'Internal server error' });
+      }
     }
   }
 });

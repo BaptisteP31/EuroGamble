@@ -70,9 +70,13 @@ router.delete('/:id', adminMiddleware, async (req, res) => {
   try {
     await prisma.contest.delete({ where: { id: contestId } });
     res.status(204).end();
-  } catch (error) {
-    console.error('Error deleting contest:', error);
-    res.status(500).json({ error: 'Internal server error' });
+  } catch (error: any) {
+    if (error.code === 'P2025') {
+      res.status(404).json({ error: 'Contest not found' });
+    } else {
+      console.error('Error deleting contest:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
   }
 });
 
