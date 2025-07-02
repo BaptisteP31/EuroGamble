@@ -13,6 +13,7 @@ model User {
   passwordHash String
   displayName  String
   role         String    @default("user")
+  profilePicture String? // base64-encoded image data
   createdAt    DateTime  @default(now())
   predictions  Prediction[]
   groups       Group[]   @relation("GroupOwner")

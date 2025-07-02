@@ -1,4 +1,4 @@
-# EurovGamble
+# EuroGamble
 
 - `frontend/` : React app (Vite)
 - `backend/`  : API Express + PostgreSQL

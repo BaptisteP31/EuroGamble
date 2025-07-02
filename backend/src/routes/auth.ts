@@ -74,7 +74,7 @@ router.post('/login', async (req, res) => {
                     res.status(401).json({ error: 'Invalid credentials' });
                 } else {
                     const token = generateToken({ id: user.id, email: user.email, role: user.role });
-                    res.json({ token, user: { id: user.id, displayName: user.displayName } });
+                    res.json({ token, user: { id: user.id, displayName: user.displayName, profilePicture: user.profilePicture } });
                 }
             }
         } catch (error) {
