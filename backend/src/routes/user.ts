@@ -26,8 +26,8 @@ router.get('/', adminMiddleware, async (req, res) => {
 
 // GET user by id (public, limited fields)
 router.get('/:id/public', async (req, res) => {
-  const id = Number(req.params.id);
-  if (isNaN(id)) {
+  const id = req.params.id;
+  if (!id) {
     res.status(400).json({ error: 'Invalid user id' });
     return;
   }
@@ -53,8 +53,8 @@ router.get('/:id/public', async (req, res) => {
 
 // GET user by id (admin or self)
 router.get('/:id', async (req, res) => {
-  const id = Number(req.params.id);
-  if (isNaN(id)) {
+  const id = req.params.id;
+  if (!id) {
     res.status(400).json({ error: 'Invalid user id' });
     return;
   }
@@ -96,10 +96,10 @@ router.get('/:id', async (req, res) => {
 
 // PUT update user by id (user can only edit self)
 router.put('/:id', async (req, res) => {
-  const id = Number(req.params.id);
+  const id = req.params.id;
   const { email, passwordHash, displayName, role, profilePicture } = req.body || {};
 
-  if (isNaN(id)) {
+  if (!id) {
     res.status(400).json({ error: 'Invalid user id' });
     return;
   }
@@ -143,8 +143,8 @@ router.put('/:id', async (req, res) => {
 
 // DELETE user by id (admin or self)
 router.delete('/:id', async (req, res) => {
-  const id = Number(req.params.id);
-  if (isNaN(id)) {
+  const id = req.params.id;
+  if (!id) {
     res.status(400).json({ error: 'Invalid user id' });
     return;
   }

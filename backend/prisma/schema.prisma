@@ -8,7 +8,7 @@ datasource db {
 }
 
 model User {
-  id           Int       @id @default(autoincrement())
+  id           String    @id @default(uuid())
   email        String    @unique
   passwordHash String
   displayName  String
@@ -18,6 +18,10 @@ model User {
   predictions  Prediction[]
   groups       Group[]   @relation("GroupOwner")
   groupMembers GroupMember[]
+  scores       Score[]
+  emailVerified Boolean  @default(false)
+  emailVerificationToken String? @unique @default(uuid())
+  resetPasswordToken String? @unique
 }
 
 model Contest {
@@ -48,19 +52,19 @@ model Result {
   id       Int     @id @default(autoincrement())
   entry    Entry   @relation(fields: [entryId], references: [id], onDelete: Cascade)
   entryId  Int
-  position Int
+  points   Int
   contest  Contest @relation(fields: [contestId], references: [id], onDelete: Cascade)
   contestId Int
   @@unique([entryId])
 }
 
 model Prediction {
-  id        Int      @id @default(autoincrement())
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    Int
-  contest   Contest  @relation(fields: [contestId], references: [id], onDelete: Cascade)
+  id        String    @id @default(uuid())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  contest   Contest   @relation(fields: [contestId], references: [id], onDelete: Cascade)
   contestId Int
-  entry     Entry    @relation(fields: [entryId], references: [id], onDelete: Cascade)
+  entry     Entry     @relation(fields: [entryId], references: [id], onDelete: Cascade)
   entryId   Int
   position  Int
   submittedAt DateTime @default(now())
@@ -71,10 +75,11 @@ model Group {
   id        Int          @id @default(autoincrement())
   name      String
   code      String       @unique
-  owner     User?        @relation("GroupOwner", fields: [ownerId], references: [id], onDelete: SetNull)
-  ownerId   Int?
+  owner     User?       @relation("GroupOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+  ownerId   String?
   contest   Contest      @relation(fields: [contestId], references: [id], onDelete: Cascade)
   contestId Int
+  score     Score[]
   members   GroupMember[]
 }
 
@@ -82,6 +87,20 @@ model GroupMember {
   group   Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
   groupId Int
   user    User  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId  Int
+  userId  String
   @@id([groupId, userId])
+}
+
+// Table used to store scores for users
+// Will be calculated based on their predictions and actual results
+// Only computed once the contest has ended
+model Score {
+  id      Int     @id @default(autoincrement())
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId  String
+  group   Group?  @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  groupId Int?
+  points  Int
+  rank    Int?
+  @@unique([userId, groupId])
 }

@@ -36,17 +36,21 @@ router.post('/', async (req, res) => {
     res.status(400).json({ error: `Missing fields: ${missingFields.join(', ')}` });
   } else {
     try {
-      const prediction = await prisma.prediction.create({
-        data: { userId, contestId, entryId, position },
+      // Use upsert to replace an existing prediction if it exists
+      const prediction = await prisma.prediction.upsert({
+        where: {
+          // Assumes a composite unique constraint on (userId, contestId, entryId)
+          userId_contestId_entryId: { userId, contestId, entryId },
+        },
+        update: { position },
+        create: { userId, contestId, entryId, position },
       });
-      res.status(201).json(prediction);
+      res.status(200).json(prediction);
     } catch (error: any) {
       if (error.code === 'P2003' && error.meta?.field_name?.includes('contestId')) {
         res.status(400).json({ error: 'Invalid contestId: referenced contest does not exist.' });
-      } else if (error.code === 'P2002') {
-        res.status(409).json({ error: 'Prediction for this user, contest, and entry already exists.' });
       } else {
-        console.error('Create prediction error:', error);
+        console.error('Upsert prediction error:', error);
         res.status(500).json({ error: 'Internal server error' });
       }
     }
@@ -55,11 +59,11 @@ router.post('/', async (req, res) => {
 
 // PUT update prediction by id
 router.put('/:id', async (req, res) => {
-  const id = Number(req.params.id);
+  const id = (req.params.id);
   const userId = (req as any).user?.id;
   const { contestId, entryId, position } = req.body || {};
 
-  if (isNaN(id)) {
+  if (!id) {
     res.status(400).json({ error: 'Invalid prediction id' });
   } else {
     const missingFields = [];
@@ -93,8 +97,8 @@ router.put('/:id', async (req, res) => {
 
 // DELETE prediction by id
 router.delete('/:id', adminMiddleware, async (req, res) => {
-  const id = Number(req.params.id);
-  if (isNaN(id)) {
+  const id = req.params.id;
+  if (!id) {
     res.status(400).json({ error: 'Invalid prediction id' });
   } else {
     try {

@@ -2,11 +2,12 @@ import { Router } from 'express';
 import prisma from '../prisma/client';
 
 import { adminMiddleware } from '../middlewares/adminMiddleware';
+import { authMiddleware } from '../middlewares/authMiddleware';
 
 const router = Router();
 
 // GET all contests (only for authenticated users)
-router.get('/', adminMiddleware, async (req, res) => {
+router.get('/', authMiddleware, async (req, res) => {
   try {
     const contests = await prisma.contest.findMany();
     res.json(contests);

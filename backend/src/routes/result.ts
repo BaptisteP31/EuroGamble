@@ -39,10 +39,10 @@ router.get('/:id', async (req, res) => {
 
 // POST new result
 router.post('/', adminMiddleware, async (req, res) => {
-  const { entryId, position, contestId } = req.body || {};
+  const { entryId, points, contestId } = req.body || {};
   const missingFields = [];
   if (!entryId) missingFields.push('entryId');
-  if (!position && position !== 0) missingFields.push('position');
+  if (!points && points !== 0) missingFields.push('points');
   if (!contestId) missingFields.push('contestId');
 
   if (missingFields.length > 0) {
@@ -50,7 +50,7 @@ router.post('/', adminMiddleware, async (req, res) => {
   } else {
     try {
       const result = await prisma.result.create({
-        data: { entryId, position, contestId },
+        data: { entryId, points, contestId },
       });
       res.status(201).json(result);
     } catch (error: any) {
@@ -69,14 +69,14 @@ router.post('/', adminMiddleware, async (req, res) => {
 // PUT update result by id
 router.put('/:id', adminMiddleware, async (req, res) => {
   const id = Number(req.params.id);
-  const { entryId, position, contestId } = req.body || {};
+  const { entryId, points, contestId } = req.body || {};
 
   if (isNaN(id)) {
     res.status(400).json({ error: 'Invalid result id' });
   } else {
     const missingFields = [];
     if (!entryId) missingFields.push('entryId');
-    if (!position && position !== 0) missingFields.push('position');
+    if (!points && points !== 0) missingFields.push('points');
     if (!contestId) missingFields.push('contestId');
 
     if (missingFields.length > 0) {
@@ -85,7 +85,7 @@ router.put('/:id', adminMiddleware, async (req, res) => {
       try {
         const result = await prisma.result.update({
           where: { id },
-          data: { entryId, position, contestId },
+          data: { entryId, points, contestId },
         });
         res.json(result);
       } catch (error) {
